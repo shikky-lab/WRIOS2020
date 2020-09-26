@@ -44,8 +44,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-lbluetooth -lpigpiod_if2 -lm -lrt
-CXXFLAGS=-lbluetooth -lpigpiod_if2 -lm -lrt
+CCFLAGS=-lxwiimote -lbluetooth -lpigpiod_if2 -lm -lrt
+CXXFLAGS=-lxwiimote -lbluetooth -lpigpiod_if2 -lm -lrt
 
 # Fortran Compiler Flags
 FFLAGS=

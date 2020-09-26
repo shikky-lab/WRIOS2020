@@ -7,9 +7,12 @@
 #include <pigpiod_if2.h>
 #include <math.h>
 #include<unistd.h>
-#include "MadgwickAHRS.hpp"
 #include "OmniOperator.hpp"
 #include "ArmOperator.hpp"
+#include <poll.h>
+#include "xwiimote.h"
+#include <stdlib.h>
+#include <errno.h>
 
 #define MSEC 1000000
 #define INTERVAL_200MSEC 200*MSEC
@@ -39,7 +42,6 @@ enum MODE {
 MODE actMode = BALANCEBOARD;
 volatile bool quit_flag=false;
 const float MIN_WEIGHT = 5; //バランスボードに人が乗っていないと判定する閾値
-
 /*オムニ操作初期化*/
 OmniOperator *omniOperator1 = NULL;
 const uint8_t TOP_PIN_ID = 4;
@@ -56,6 +58,39 @@ const uint8_t SW_PIN_ID = 24;//B接点(常時導通)
 const uint8_t ARM_PIN_ID = 23;//
 const uint8_t SERVO_PAN=20;
 const uint8_t SERVO_TILT=21;
+
+/*Wiiリモコン関係*/
+struct WiiRemoteMain{
+	uint8_t _A;
+	uint8_t _B;
+	uint8_t _UP;
+	uint8_t _DOWN;
+	uint8_t _LEFT;
+	uint8_t _RIGHT;
+	uint8_t _MINUS;
+	uint8_t _PLUS;
+	uint8_t _HOME;
+	uint8_t _ONE;
+	uint8_t _TWO;
+
+	int32_t _ACC_X;
+	int32_t _ACC_Y;
+	int32_t _ACC_Z;
+
+	//nunchuk
+	int32_t _NC_ACC_X;
+	int32_t _NC_ACC_Y;
+	int32_t _NC_ACC_Z;
+	int32_t _NC_STICK_X;
+	int32_t _NC_STICK_Y;
+	uint8_t _NC_C;
+	uint8_t _NC_Z;
+
+	//motionplus
+	int32_t _MP_ACC_X;
+	int32_t _MP_ACC_Y;
+	int32_t _MP_ACC_Z;
+}wmMain;
 
 void interruptedFunc(int sig, siginfo_t *si, void *uc);
 
@@ -100,6 +135,9 @@ void interruptedFunc(int sig, siginfo_t *si, void *uc) {
         case SIGNAL_10MS:
             break;
 		case SIGNAL_20MS:
+			break;
+		case SIGNAL_200MS:
+			printf("ncX:%03d\tncY:%03d\tmpX:%05d\tmpY:%05d\tmpZ:%05d\r\n",wmMain._NC_STICK_X,wmMain._NC_STICK_Y,wmMain._MP_ACC_X,wmMain._MP_ACC_Y,wmMain._MP_ACC_Z);
 			break;
     }
 }
@@ -183,7 +221,163 @@ void quitProgram(int piId, IndicatorOperator &greenLedOperator,IndicatorOperator
     pigpio_stop(piId);
     exit(0);
 }
+static char *get_dev(int num)
+{
+	struct xwii_monitor *mon;
+	char *ent;
+	int i = 0;
 
+	mon = xwii_monitor_new(false, false);
+	if (!mon) {
+		printf("Cannot create monitor\n");
+		return NULL;
+	}
+
+	while ((ent = xwii_monitor_poll(mon))) {
+		if (++i == num)
+			break;
+		free(ent);
+	}
+
+	xwii_monitor_unref(mon);
+
+	if (!ent)
+		printf("Cannot find device with number #%d\n", num);
+
+	return ent;
+}
+static struct xwii_iface *iface;
+
+/* device watch events */
+
+static void handle_watch(void)
+{
+	static unsigned int num;
+	int ret;
+
+	printf("Info: Watch Event #%u", ++num);
+
+	ret = xwii_iface_open(iface, xwii_iface_available(iface) |
+				     XWII_IFACE_WRITABLE);
+	if (ret)
+		printf("Error: Cannot open interface: %d", ret);
+
+}
+static void key_show(const struct xwii_event *event)
+{
+	unsigned int code = event->v.key.code;
+	bool pressed = event->v.key.state;
+	char *str = NULL;
+
+	if (code == XWII_KEY_LEFT) {
+		puts("L");
+	} else if (code == XWII_KEY_RIGHT) {
+		puts("R");
+	} else if (code == XWII_KEY_UP) {
+		puts("U");
+	} else if (code == XWII_KEY_DOWN) {
+		puts("D");
+	} else if (code == XWII_KEY_A) {
+		if (pressed)
+			puts("A pressed");
+		else
+			puts("A released");
+	}
+}
+
+static void set_accel(const struct xwii_event *event){
+	wmMain._ACC_X=event->v.abs[0].x;
+	wmMain._ACC_Y=event->v.abs[0].y;
+	wmMain._ACC_Z=event->v.abs[0].z;
+}
+
+static void set_nunchuk(const struct xwii_event *event){
+	if (event->type == XWII_EVENT_NUNCHUK_MOVE) {
+		wmMain._NC_ACC_X=event->v.abs[1].x;
+		wmMain._NC_ACC_Y=event->v.abs[1].y;
+		wmMain._NC_ACC_Z=event->v.abs[1].z;
+
+		wmMain._NC_STICK_X=event->v.abs[0].x;
+		wmMain._NC_STICK_Y=event->v.abs[0].y;
+	}
+	if (event->type == XWII_EVENT_NUNCHUK_KEY) {
+		if (event->v.key.code == XWII_KEY_C) {
+			wmMain._NC_C=event->v.key.state;
+		} else if (event->v.key.code == XWII_KEY_Z) {
+			wmMain._NC_Z=event->v.key.state;
+		}
+	}
+}
+static void set_motionplus(const struct xwii_event *event){
+	wmMain._MP_ACC_X=event->v.abs[0].x;
+	wmMain._MP_ACC_Y=event->v.abs[0].y;
+	wmMain._MP_ACC_Z=event->v.abs[0].z;
+}
+
+int init_iface(struct xwii_iface *iface){
+	struct xwii_event event;
+	int ret = 0, fds_num;
+	struct pollfd fds[2];
+
+	//対象のfdが二枠なには，extensionを挿した際にfds[1]に入ってくるから？
+	memset(fds, 0, sizeof(fds));
+	fds[0].fd = 0;
+	fds[0].events = POLLIN;
+	fds[1].fd = xwii_iface_get_fd(iface);
+	fds[1].events = POLLIN;
+	fds_num = 2;
+
+	ret = xwii_iface_watch(iface, true);
+	if (ret)
+		puts("Error: Cannot initialize hotplug watch descriptor");
+}
+
+static int run_iface(struct xwii_iface *iface,struct pollfd fds[2],int fds_num)
+{
+	ret = poll(fds, fds_num, -1);
+	if (ret < 0) {
+		if (errno != EINTR) {
+			ret = -errno;
+			printf("Error: Cannot poll fds: %d", ret);
+			break;
+		}
+	}
+
+	ret = xwii_iface_dispatch(iface, &event, sizeof(event));
+	if (ret) {
+		if (ret != -EAGAIN) {
+			printf("Error: Read failed with err:%d", ret);
+			break;
+		}
+	} else {
+		switch (event.type) {
+		case XWII_EVENT_GONE:
+			puts("Info: Device gone");
+			fds[1].fd = -1;
+			fds[1].events = 0;
+			fds_num = 1;
+			break;
+		case XWII_EVENT_WATCH:
+			handle_watch();
+			break;
+		case XWII_EVENT_KEY:
+			key_show(&event);
+			break;
+		case XWII_EVENT_ACCEL:
+			set_accel(&event);
+			break;
+		case XWII_EVENT_NUNCHUK_KEY:
+		case XWII_EVENT_NUNCHUK_MOVE:
+			set_nunchuk(&event);
+			break;
+		case XWII_EVENT_MOTION_PLUS:
+			set_motionplus(&event);
+			break;
+		}
+	}
+
+	return ret;
+}
 int main(void) {
     int piId = pigpio_start(NULL, NULL); //ネットワーク越しに使えるっぽい．NULL指定時はローカルホストの8888ポート
 
@@ -199,9 +393,26 @@ int main(void) {
 	/*アーム部分のセットアップ*/
 	armOperator1 = new ArmOperator(piId,SERVO_TILT,SERVO_PAN,ARM_PIN_ID,SW_PIN_ID);
 
+	/*xwiimote関係*/
+	puts("start xwiimote initialition");
+	char *path = NULL;
+	path = get_dev(1);
+	int ret = xwii_iface_new(&iface, path);
+	free(path);
+	if (ret) {
+		printf("Cannot create xwii_ifaces err:%d\r\n",  ret);
+	} else {
+		ret = xwii_iface_open(iface, xwii_iface_available(iface) | XWII_IFACE_WRITABLE);
+		if (ret)
+			printf("Error: Cannot open interface: %d\r\n", ret);
+		else{
+			puts("connected");
+		}
 
-    interupt_init();
-//    timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
+		interupt_init();
+		timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
+		ret = run_iface(iface);
+	}
 //    timer_init(INTERVAL_20MSEC, SIGNAL_20MS);
 
 	char buff[10];
@@ -235,6 +446,8 @@ int main(void) {
 
 
 	/*後処理*/
+	xwii_iface_unref(iface);
+
 	greenLedOperator.putOff();
 	redLedOperator.putOff();
     pigpio_stop(piId);
