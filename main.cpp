@@ -99,6 +99,75 @@ struct WiiRemoteMain{
 	int32_t _MP_ACC_Z;
 }wmMain;
 
+struct WiiRemoteBB{
+	//motionplus
+	uint16_t _BB_RIGHT_TOP;
+	uint16_t _BB_RIGHT_BOTTOM;
+	uint16_t _BB_LEFT_TOP;
+	uint16_t _BB_LEFT_BOTTOM;
+}wmBB;
+
+//過去N個のfloatの平均をとりたいだけのクラス．個数<nの場合は考えないこととする．
+class LightFloatQueue{
+    static const int MAX=10;
+    float value[MAX];
+    int cnt;
+public:
+    LightFloatQueue(){
+    };
+    void add(float val){
+	value[cnt]=val;
+	cnt = cnt<(MAX-1) ? cnt+1:0;
+    }
+    float getAverage(){
+	float ret=0.;
+	for(int i=0;i<MAX;i++){
+	    ret+=value[i];
+	}
+	return ret/MAX;
+    }
+};
+LightFloatQueue balanceXQueue,balanceYQueue;
+float balanceXcriteria,balanceYcriteria;//重心の基準値．init時に10回分のアベレージを入れておく．
+float bb_position[2];
+/*
+ * バランスボードの重心(比率)をx,yそれぞれ返す．
+ * 計算式としては，x>0において，y=-((1-x)/(1+x) - 1)
+ * x<0においてはその逆．
+ * x=0 の時に0で，x limit to 1で 1に漸近する．
+ */
+void updatePositionFromBalanceBoard(float position[2]) {
+    position[0] = ((float)wmBB._BB_RIGHT_TOP + wmBB._BB_RIGHT_BOTTOM) / (wmBB._BB_LEFT_TOP + wmBB._BB_LEFT_BOTTOM);
+    if (position[0] > 1)
+        position[0] = (((float)wmBB._BB_LEFT_TOP + wmBB._BB_LEFT_BOTTOM) / (wmBB._BB_RIGHT_TOP + wmBB._BB_RIGHT_BOTTOM) * (-1.0)) + 1.0;
+    else
+        position[0] -= 1;
+
+    position[1] = ((float)wmBB._BB_LEFT_TOP + wmBB._BB_RIGHT_TOP) / (wmBB._BB_LEFT_BOTTOM + wmBB._BB_RIGHT_BOTTOM);
+    if (position[1] > 1)
+        position[1] = (((float)wmBB._BB_LEFT_BOTTOM + wmBB._BB_RIGHT_BOTTOM) / (wmBB._BB_LEFT_TOP + wmBB._BB_RIGHT_TOP) * (-1.0)) + 1.0;
+    else
+        position[1] -= 1;
+
+    //履歴の保存
+    balanceXQueue.add(position[0]);
+    balanceYQueue.add(position[1]);
+}
+
+/*
+ * バランスボードの重心(重心の傾きなどを補正済)を返す．基本的にはこれだけ使う
+ */
+void getRevisedPositionFromBalanceBoard(float position[2]) {
+    updatePositionFromBalanceBoard(position);
+    position[0]-=balanceXcriteria;
+    position[1]-=balanceYcriteria;
+}
+
+void initCriteriaOfBalanceBoard() {
+    balanceXcriteria = balanceXQueue.getAverage();
+    balanceYcriteria = balanceYQueue.getAverage();
+}
+
 void interruptedFunc(int sig, siginfo_t *si, void *uc);
 
 void timer_init(int interval, int sigId) {
@@ -144,7 +213,12 @@ void interruptedFunc(int sig, siginfo_t *si, void *uc) {
 		case SIGNAL_20MS:
 			break;
 		case SIGNAL_200MS:
-			printf("ncX:%03d\tncY:%03d\tmpX:%05d\tmpY:%05d\tmpZ:%05d\r\n",wmMain._NC_STICK_X,wmMain._NC_STICK_Y,wmMain._MP_ACC_X,wmMain._MP_ACC_Y,wmMain._MP_ACC_Z);
+			float revisedPos[2];
+			getRevisedPositionFromBalanceBoard(revisedPos);
+
+			printf("bbX:%.5f\tbbY:%.5f\r\n",revisedPos[0],revisedPos[1]);
+//			printf("bbW:%05hu\tbbX:%05hu\tbbY:%05hu\tbbZ:%05hu\r\n",wmBB._BB_LEFT_TOP,wmBB._BB_RIGHT_TOP,wmBB._BB_LEFT_BOTTOM,wmBB._BB_RIGHT_BOTTOM);
+//			printf("ncX:%03d\tncY:%03d\tmpX:%05d\tmpY:%05d\tmpZ:%05d\r\n",wmMain._NC_STICK_X,wmMain._NC_STICK_Y,wmMain._MP_ACC_X,wmMain._MP_ACC_Y,wmMain._MP_ACC_Z);
 			break;
     }
 }
@@ -322,6 +396,17 @@ static void set_motionplus(const struct xwii_event *event){
 	wmMain._MP_ACC_Z=event->v.abs[0].z;
 }
 
+/*
+ * xwiidで取得できる値はすでに補正済みっぽい
+ */
+static void set_balanceboard(const struct xwii_event *event){
+	wmBB._BB_RIGHT_TOP=event->v.abs[0].x;
+	wmBB._BB_RIGHT_BOTTOM=event->v.abs[1].x;
+	wmBB._BB_LEFT_TOP=event->v.abs[2].x;
+	wmBB._BB_LEFT_BOTTOM=event->v.abs[3].x;
+	updatePositionFromBalanceBoard(bb_position);
+}
+
 //static int run_iface(struct xwii_iface *iface)
 static int run_iface(struct xwii_iface *iface[],const int device_num)
 {
@@ -389,6 +474,9 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 				case XWII_EVENT_MOTION_PLUS:
 					set_motionplus(&event);
 					break;
+				case XWII_EVENT_BALANCE_BOARD:
+					set_balanceboard(&event);
+					break;
 				}
 			}
 		}
@@ -398,6 +486,9 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 				case 'q':
 					puts("finish");
 					return(0);
+				case 'i'://initialize balance board
+					initCriteriaOfBalanceBoard();
+					break;
 			}
 		}
 	}
@@ -494,8 +585,8 @@ int main(void) {
 		}
 	}
 
-//	interupt_init();
-//	timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
+	interupt_init();
+	timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
 //    timer_init(INTERVAL_20MSEC, SIGNAL_20MS);
 	ret = run_iface(iface,device_num);
 	return (0);
