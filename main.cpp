@@ -14,6 +14,12 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
+#include <sys/socket.h>
+#include <string.h>
+//#include <curses.h>
+
 #define MSEC 1000000
 #define INTERVAL_200MSEC 200*MSEC
 #define INTERVAL_50MSEC 50*MSEC
@@ -25,6 +31,7 @@
 
 #define abs_(x) ((x)<0.0 ? (-1*(x)) : (x) )
 
+#define PATH_LENGTH 100
 
 using namespace std;
 
@@ -246,23 +253,24 @@ static char *get_dev(int num)
 
 	return ent;
 }
-static struct xwii_iface *iface;
+static struct xwii_iface *iface[2];
 
 /* device watch events */
 
-static void handle_watch(void)
-{
-	static unsigned int num;
-	int ret;
+//static void handle_watch(void)
+//{
+//	static unsigned int num;
+//	int ret;
 
-	printf("Info: Watch Event #%u", ++num);
+//	printf("Info: Watch Event #%u", ++num);
 
-	ret = xwii_iface_open(iface, xwii_iface_available(iface) |
-				     XWII_IFACE_WRITABLE);
-	if (ret)
-		printf("Error: Cannot open interface: %d", ret);
+//	ret = xwii_iface_open(iface, xwii_iface_available(iface) |
+//				     XWII_IFACE_WRITABLE);
+//	if (ret)
+//		printf("Error: Cannot open interface: %d", ret);
 
-}
+//}
+
 static void key_show(const struct xwii_event *event)
 {
 	unsigned int code = event->v.key.code;
@@ -314,70 +322,123 @@ static void set_motionplus(const struct xwii_event *event){
 	wmMain._MP_ACC_Z=event->v.abs[0].z;
 }
 
-int init_iface(struct xwii_iface *iface){
+//static int run_iface(struct xwii_iface *iface)
+static int run_iface(struct xwii_iface *iface[],const int device_num)
+{
 	struct xwii_event event;
-	int ret = 0, fds_num;
-	struct pollfd fds[2];
+	int ret = 0;
+	int fds_num=device_num+1;//標準入力分をプラス
+	struct pollfd fds[3];//device_numが1の時は，3つめは使われない
 
-	//対象のfdが二枠なには，extensionを挿した際にfds[1]に入ってくるから？
 	memset(fds, 0, sizeof(fds));
 	fds[0].fd = 0;
 	fds[0].events = POLLIN;
-	fds[1].fd = xwii_iface_get_fd(iface);
-	fds[1].events = POLLIN;
-	fds_num = 2;
+	for(int i=0;i<device_num;i++){
+		fds[i+1].fd = xwii_iface_get_fd(iface[i]);
+		fds[i+1].events = POLLIN;
 
-	ret = xwii_iface_watch(iface, true);
-	if (ret)
-		puts("Error: Cannot initialize hotplug watch descriptor");
-}
-
-static int run_iface(struct xwii_iface *iface,struct pollfd fds[2],int fds_num)
-{
-	ret = poll(fds, fds_num, -1);
-	if (ret < 0) {
-		if (errno != EINTR) {
-			ret = -errno;
-			printf("Error: Cannot poll fds: %d", ret);
-			break;
-		}
 	}
 
-	ret = xwii_iface_dispatch(iface, &event, sizeof(event));
-	if (ret) {
-		if (ret != -EAGAIN) {
-			printf("Error: Read failed with err:%d", ret);
-			break;
+	for(int i=0;i<device_num;i++){
+		ret = xwii_iface_watch(iface[i], true);
+		if (ret)
+			puts("Error: Cannot initialize hotplug watch descriptor");
+	}
+//	curs_set(0);
+//	timeout(0);//getch()のタイムアウトを0にする．
+
+	char buff[10];
+	while(true){
+		ret = poll(fds, fds_num, -1);//標準入力含め，変化があるまで待機
+		if (ret < 0) {
+			if (errno != EINTR) {
+				ret = -errno;
+				printf("Error: Cannot poll fds: %d", ret);
+				return ret;
+			}
 		}
-	} else {
-		switch (event.type) {
-		case XWII_EVENT_GONE:
-			puts("Info: Device gone");
-			fds[1].fd = -1;
-			fds[1].events = 0;
-			fds_num = 1;
-			break;
-		case XWII_EVENT_WATCH:
-			handle_watch();
-			break;
-		case XWII_EVENT_KEY:
-			key_show(&event);
-			break;
-		case XWII_EVENT_ACCEL:
-			set_accel(&event);
-			break;
-		case XWII_EVENT_NUNCHUK_KEY:
-		case XWII_EVENT_NUNCHUK_MOVE:
-			set_nunchuk(&event);
-			break;
-		case XWII_EVENT_MOTION_PLUS:
-			set_motionplus(&event);
-			break;
+
+		for(int i=0;i<device_num;i++){
+			ret = xwii_iface_dispatch(iface[i], &event, sizeof(event));
+			if (ret) {
+				if (ret != -EAGAIN) {
+					printf("Error: Read failed with err:%d", ret);
+					return ret;
+				}
+			} else {
+				switch (event.type) {
+				case XWII_EVENT_GONE:
+					puts("Info: Device gone");
+					fds[i+1].fd = -1;
+					fds[i+1].events = 0;
+					fds_num -=1;
+					break;
+				case XWII_EVENT_WATCH:
+//					handle_watch();
+					break;
+				case XWII_EVENT_KEY:
+					key_show(&event);
+					break;
+				case XWII_EVENT_ACCEL:
+					set_accel(&event);
+					break;
+				case XWII_EVENT_NUNCHUK_KEY:
+				case XWII_EVENT_NUNCHUK_MOVE:
+					set_nunchuk(&event);
+					break;
+				case XWII_EVENT_MOTION_PLUS:
+					set_motionplus(&event);
+					break;
+				}
+			}
+		}
+
+		if(receive(0,buff,sizeof(buff))){
+			switch(buff[0]){
+				case 'q':
+					puts("finish");
+					return(0);
+			}
 		}
 	}
 
 	return ret;
 }
+/*
+ * 可変にするの面倒なので，2つまで取得
+ * 取得できたwiimoteのパスを返す
+ */
+static int get_all_device_paths(char paths[][100], int *deviceNum)
+{
+	struct xwii_monitor *mon;
+	char *ent;
+	int num = 0;
+
+	mon = xwii_monitor_new(false, false);
+	if (!mon) {
+		printf("Cannot create monitor\n");
+		return -EINVAL;
+	}
+
+	while ((ent = xwii_monitor_poll(mon))) {
+		//*(paths[num]+0) == paths[num][0]
+		//ということは，paths[num]+0 == paths[num] だが，これは*(char[100])で，*charとは別物らしい．
+		//左辺をアドレス指定すると，それは定数扱いになって，5=10みたいな計算をしようとしていることと同じになるらしく，エラーが出る．
+		//なので苦肉の策としてstrcpyを使う
+		strcpy(paths[num],ent);
+//		paths+num*PATH_LENGTH=ent;
+		printf("  Found device #%d: %s\n", ++num, ent);
+		free(ent);
+		*deviceNum=num;
+		if(num==2){
+			break;
+		}
+	}
+
+	xwii_monitor_unref(mon);
+	return 0;
+}
+
 int main(void) {
     int piId = pigpio_start(NULL, NULL); //ネットワーク越しに使えるっぽい．NULL指定時はローカルホストの8888ポート
 
@@ -395,31 +456,59 @@ int main(void) {
 
 	/*xwiimote関係*/
 	puts("start xwiimote initialition");
-	char *path = NULL;
-	path = get_dev(1);
-	int ret = xwii_iface_new(&iface, path);
-	free(path);
-	if (ret) {
-		printf("Cannot create xwii_ifaces err:%d\r\n",  ret);
-	} else {
-		ret = xwii_iface_open(iface, xwii_iface_available(iface) | XWII_IFACE_WRITABLE);
-		if (ret)
-			printf("Error: Cannot open interface: %d\r\n", ret);
-		else{
-			puts("connected");
-		}
+	char paths[2][100];//パス長ってどのくらいか不明だが，1000取っておけば多分大丈夫でしょう．
+//	char paths[PATH_LENGTH*2];//どうも多次元配列がうまくいかないので妥協
+	int device_num=0;
 
-		interupt_init();
-		timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
-		ret = run_iface(iface);
+	/*パスの取得*/
+	int ret= get_all_device_paths(paths,&device_num);
+	if(ret!=0){
+		puts("failed to get any device path");
+		return ret;
 	}
+	if(device_num==0){
+		puts("there are not connected devices");
+		return ret;
+	}
+
+	printf("%d devices detected!\r\n",device_num);
+
+	/*インターフェースの作成*/
+	for(int i=0;i<device_num;i++){
+		ret = xwii_iface_new(&iface[i], paths[i]);
+		if (ret) {
+			printf("Cannot create xwii_ifaces No.%d\r\n",  i);
+			return ret;
+		}
+	}
+
+	/*接続確立*/
+	for(int i=0;i<device_num;i++){
+		ret = xwii_iface_open(iface[i], xwii_iface_available(iface[i]) | XWII_IFACE_WRITABLE);
+		if (ret){
+			printf("Error: Cannot open interface: %d\r\n", i);
+			return ret;
+
+		}else{
+			printf("connected device No.%d\r\n",i);
+		}
+	}
+
+//	interupt_init();
+//	timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
 //    timer_init(INTERVAL_20MSEC, SIGNAL_20MS);
+	ret = run_iface(iface,device_num);
+	return (0);
 
 	char buff[10];
 	bool quitFlag=false;
 	int prevSW=1;
 	
+	struct pollfd fds[2];
 	while(!quitFlag){
+		if(ret){
+			break;
+		}
 		float xyVals[2] = {0., 0.};
 		if(receive(0,buff,sizeof(buff))){
 			switch(buff[0]){
@@ -446,7 +535,9 @@ int main(void) {
 
 
 	/*後処理*/
-	xwii_iface_unref(iface);
+	for(int i=0;i<device_num;i++){
+		xwii_iface_unref(iface[i]);
+	}
 
 	greenLedOperator.putOff();
 	redLedOperator.putOff();
