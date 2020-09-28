@@ -25,7 +25,8 @@ void OmniOperator::fastAtan(float y,float x){
 #define PI 3.14159265359
 #define deg_to_rad(deg) (((deg)/360)*2*PI)
 
-int16_t _atan2(int16_t _y, int16_t _x) {
+//多項式近似による実現．0.001radくらいのずれだったので，多分実用上問題なさそう．
+float _atan2(int16_t _y, int16_t _x) {
 
 	if(_x==0){
 		if(_y>0){
@@ -73,7 +74,8 @@ int16_t _atan2(int16_t _y, int16_t _x) {
   return deg_to_rad((float)a/100);
 }
 
-//x,yはそれぞれ1以下，というか合計して1になる小数が来るはず．
+//x,yはそれぞれ1以下，というか合計して1になる小数の想定．
+//じゃなかった．nunchukの時は中央1,1でそれぞれ0~2の値
 void OmniOperator::calc_translation(float x, float y){
 	if(x==0 && y==0){
 		top_motor_temp=0;
@@ -82,10 +84,10 @@ void OmniOperator::calc_translation(float x, float y){
 		return;
 	}
 
-	float rad0 = x!=0?atan2f(y,x):y>0?PI/2:-PI/2;
-	float rad = _atan2((int16_t)y*1000,(int16_t)x*1000);
+//	float rad0 = x!=0?atan2f(y,x):y>0?PI/2:-PI/2;
+	float rad = _atan2((int16_t)(y*1000),(int16_t)(x*1000));
 
-	printf("org=%.5f\tsimpl=%.5f\r\n",rad0,rad);
+//	printf("org=%.5f\tsimpl=%.5f\r\n",rad0,rad);
 
 	float motor_power = sqrt(powf(x,2)+powf(y,2));
 

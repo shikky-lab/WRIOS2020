@@ -46,7 +46,7 @@ enum MODE {
     NUNCHUK,
     BALANCEBOARD,
 };
-MODE actMode = BALANCEBOARD;
+MODE actMode = NUNCHUK;
 volatile bool quit_flag=false;
 const float MIN_WEIGHT = 5; //バランスボードに人が乗っていないと判定する閾値
 /*オムニ操作初期化*/
@@ -105,6 +105,7 @@ struct WiiRemoteBB{
 	uint16_t _BB_RIGHT_BOTTOM;
 	uint16_t _BB_LEFT_TOP;
 	uint16_t _BB_LEFT_BOTTOM;
+	uint16_t _BB_TOTAL;
 }wmBB;
 
 //過去N個のfloatの平均をとりたいだけのクラス．個数<nの場合は考えないこととする．
@@ -168,6 +169,44 @@ void initCriteriaOfBalanceBoard() {
     balanceYcriteria = balanceYQueue.getAverage();
 }
 
+/*
+ * 本体加速度によるピッチ角
+ */
+/*
+ * +-1800で返す
+ */
+int32_t radToDeg(float rad){
+	return (int32_t)(rad * 1800/PI);
+}
+//y軸使うのがよさそう．水平で大体-30,下90°で50,上90°で-130.つまり下にいくと+80，上に行くと100マイナスって感じらしい．
+int32_t calc_pitch(){
+	int32_t pitch;
+	int32_t y=wmMain._ACC_Y;
+
+	y+=30;//水平で30くらいずれているため
+	if(y<0){//上向き
+		pitch=900-radToDeg(acos(-y/(float)110));//マージン取って+10の110で除算
+	}else{//下向き
+		pitch=-900+radToDeg(acos(y/(float)90));
+	}
+	return pitch;
+}
+
+/*
+ * モーションプラスによるヨー角計算
+ */
+#define MAX_YAW 4500 //6000で90°くらいなので，45°くらいの動作範囲を想定しつつ，少しマージンとって指定
+int32_t totalYaw=0;
+void init_yaw_angle(){
+	totalYaw=0;
+}
+/*-1800~1800で返す*/
+int32_t calc_yaw(){
+	//1000大体6000くらいで90度．(根拠なし)
+	return totalYaw*3/20;//90/6000=>3/20 
+}
+bool caliblate_mp_flag=true;
+
 void interruptedFunc(int sig, siginfo_t *si, void *uc);
 
 void timer_init(int interval, int sigId) {
@@ -204,6 +243,39 @@ void interupt_init() {
     }
 }
 
+float addReviseRotation(float rate = 0.3) {
+    if (actMode == NUNCHUK) {
+        return 0;
+    }
+
+	float x_val=float(wmMain._NC_STICK_X)/100;//-1~1の値が得られる
+//    float y_val = float(wiimote->state.ext.nunchuk.stick[CWIID_Y]) / 127 - 1;
+    if (abs_(x_val) < 5.0 / 100) {
+        x_val = 0;
+    }
+//    printf("stickX:%f\r\n", x_val);
+    return -x_val*rate;
+}
+
+int calcByNunchuk( float xyVals[2]) {
+
+    float x_val = float(wmMain._NC_STICK_X) / 100; //-1~1の値が得られる
+    float y_val = float(wmMain._NC_STICK_Y) / 100;
+
+    //printf("%f\t",x_val);
+    /*ニュートラルのずれを無視*/
+    if (abs_(x_val) < 5.0 / 100) {
+        x_val = 0;
+    }
+    if (abs_(y_val) < 5.0 / 100) {
+        y_val = 0;
+    }
+    xyVals[0] = x_val;
+    xyVals[1] = y_val;
+    return 0;
+}
+
+uint32_t prev_mp_x=0;
 void interruptedFunc(int sig, siginfo_t *si, void *uc) {
     static uint8_t buttonA = 0;
     static uint8_t buttonC = 0;
@@ -213,12 +285,57 @@ void interruptedFunc(int sig, siginfo_t *si, void *uc) {
 		case SIGNAL_20MS:
 			break;
 		case SIGNAL_200MS:
-			float revisedPos[2];
-			getRevisedPositionFromBalanceBoard(revisedPos);
-
-			printf("bbX:%.5f\tbbY:%.5f\r\n",revisedPos[0],revisedPos[1]);
+			//バランスボード重量
 //			printf("bbW:%05hu\tbbX:%05hu\tbbY:%05hu\tbbZ:%05hu\r\n",wmBB._BB_LEFT_TOP,wmBB._BB_RIGHT_TOP,wmBB._BB_LEFT_BOTTOM,wmBB._BB_RIGHT_BOTTOM);
+			//ヌンチャク
+//			printf("ncX:%03d\tncY:%03d\r\n",wmMain._NC_STICK_X,wmMain._NC_STICK_Y);
+			//モーションプラス+ヌンチャク
 //			printf("ncX:%03d\tncY:%03d\tmpX:%05d\tmpY:%05d\tmpZ:%05d\r\n",wmMain._NC_STICK_X,wmMain._NC_STICK_Y,wmMain._MP_ACC_X,wmMain._MP_ACC_Y,wmMain._MP_ACC_Z);
+			//モーションプラス
+//			printf("mpX:%05d\tmpY:%05d\tmpZ:%05d\r\n",wmMain._MP_ACC_X,wmMain._MP_ACC_Y,wmMain._MP_ACC_Z);
+			//ピッチ角，ヨー角
+			printf("pitch=%04d,yaw:%04d\r\n",calc_pitch(),calc_yaw());
+			armOperator1->setTilt(calc_pitch());
+			armOperator1->setPan(calc_yaw());
+
+			if(prev_mp_x==wmMain._MP_ACC_X){
+//				caliblate_mp_flag=true;
+//				puts("fputs called");
+				fputs("z\r\n",stdin);
+			}
+			prev_mp_x=wmMain._MP_ACC_X;
+			
+
+            float xyVals[2] = {0., 0.};
+            switch (actMode) {
+                case NUNCHUK:
+                    calcByNunchuk( xyVals);
+                    break;
+                case BALANCEBOARD:
+					//センターポイント初期化処理．こっちで調整するより，立ち位置見直してもらったほうが事故が少ない．
+					/*
+                    //ボタン押下処理．暫定対策．
+                    if ((buttonA^(wiimote1.state.buttons & CWIID_BTN_A)) && (wiimote1.state.buttons & CWIID_BTN_A)) {
+                        wiimote2.initCriteriaOfBalanceBoard();
+                        puts("INIT CALLED");
+                    } else if ((buttonC^(wiimote1.state.ext.nunchuk.buttons & CWIID_NUNCHUK_BTN_C)) && (wiimote1.state.ext.nunchuk.buttons & CWIID_NUNCHUK_BTN_C)) {
+                        wiimote2.initCriteriaOfBalanceBoard();
+                        puts("INIT CALLED");
+                    }
+                    buttonA = wiimote1.state.buttons & CWIID_BTN_A;
+                    buttonC = wiimote1.state.ext.nunchuk.buttons & CWIID_NUNCHUK_BTN_C;
+					 */
+
+					getRevisedPositionFromBalanceBoard(xyVals);
+                    if (!wmMain._NC_Z || wmBB._BB_TOTAL<MIN_WEIGHT) {//ボタンを押していない，または重量が閾値を超えていない場合は停止
+                        xyVals[0] = xyVals[1] = 0;
+                    }
+                    break;
+            }
+            float rotation = addReviseRotation();
+
+            /*モーター回転量計算*/
+            omniOperator1->move(xyVals[0], xyVals[1], rotation);
 			break;
     }
 }
@@ -345,25 +462,49 @@ static struct xwii_iface *iface[2];
 
 //}
 
-static void key_show(const struct xwii_event *event)
+static void set_keys(const struct xwii_event *event)
 {
 	unsigned int code = event->v.key.code;
 	bool pressed = event->v.key.state;
 	char *str = NULL;
 
-	if (code == XWII_KEY_LEFT) {
-		puts("L");
-	} else if (code == XWII_KEY_RIGHT) {
-		puts("R");
-	} else if (code == XWII_KEY_UP) {
-		puts("U");
-	} else if (code == XWII_KEY_DOWN) {
-		puts("D");
-	} else if (code == XWII_KEY_A) {
-		if (pressed)
-			puts("A pressed");
-		else
-			puts("A released");
+	switch(code){
+		case XWII_KEY_LEFT:
+			break;
+		case XWII_KEY_RIGHT:
+			break;
+		case XWII_KEY_DOWN:
+			break;
+		case XWII_KEY_UP:
+			break;
+		case XWII_KEY_A:
+			if(pressed){
+				wmMain._A=1;
+				init_yaw_angle();//これがsetPanMiddle()に相当
+				armOperator1->setTiltMiddle(calc_pitch());
+				printf("pitch middle = %d\r\n",armOperator1->getTiltMiddle());
+			}else{
+				wmMain._A=0;
+			}
+			break;
+		case XWII_KEY_B:
+			break;
+		case XWII_KEY_PLUS:
+			break;
+		case XWII_KEY_MINUS:
+			break;
+		case XWII_KEY_HOME:
+			if(pressed){
+				wmMain._HOME=1;
+				caliblate_mp_flag=true;
+			}else{
+				wmMain._HOME=0;
+			}
+			break;
+		case XWII_KEY_ONE:
+			break;
+		case XWII_KEY_TWO:
+			break;
 	}
 }
 
@@ -394,7 +535,26 @@ static void set_motionplus(const struct xwii_event *event){
 	wmMain._MP_ACC_X=event->v.abs[0].x;
 	wmMain._MP_ACC_Y=event->v.abs[0].y;
 	wmMain._MP_ACC_Z=event->v.abs[0].z;
+
+	totalYaw+=wmMain._MP_ACC_X/100;
+	if(totalYaw>MAX_YAW){
+		totalYaw=MAX_YAW;
+	}else if(totalYaw<-MAX_YAW){
+		totalYaw = -MAX_YAW;
+	}
 }
+
+static void calibrate_motionplus(struct xwii_iface *iface){
+	int32_t x, y, z, factor;
+
+	xwii_iface_get_mp_normalization(iface, &x, &y, &z, &factor);
+	x = wmMain._MP_ACC_X + x;
+	y = wmMain._MP_ACC_Y + y;
+	z = wmMain._MP_ACC_Z + z;
+	factor=50;//xwiishowでのデフォルト係数
+	xwii_iface_set_mp_normalization(iface, x, y, z, factor);
+}
+
 
 /*
  * xwiidで取得できる値はすでに補正済みっぽい
@@ -404,6 +564,8 @@ static void set_balanceboard(const struct xwii_event *event){
 	wmBB._BB_RIGHT_BOTTOM=event->v.abs[1].x;
 	wmBB._BB_LEFT_TOP=event->v.abs[2].x;
 	wmBB._BB_LEFT_BOTTOM=event->v.abs[3].x;
+
+	wmBB._BB_TOTAL=wmBB._BB_LEFT_BOTTOM+wmBB._BB_LEFT_TOP+wmBB._BB_RIGHT_BOTTOM+wmBB._BB_RIGHT_TOP;
 	updatePositionFromBalanceBoard(bb_position);
 }
 
@@ -434,7 +596,7 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 
 	char buff[10];
 	while(true){
-		ret = poll(fds, fds_num, -1);//標準入力含め，変化があるまで待機
+		ret = poll(fds, fds_num, -1);//標準入力含め，変化があるまで待機．なんかよく固まるからタイムアウト入れてみた．
 		if (ret < 0) {
 			if (errno != EINTR) {
 				ret = -errno;
@@ -459,10 +621,11 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 					fds_num -=1;
 					break;
 				case XWII_EVENT_WATCH:
+					puts("Info: watch happened");
 //					handle_watch();
 					break;
 				case XWII_EVENT_KEY:
-					key_show(&event);
+					set_keys(&event);
 					break;
 				case XWII_EVENT_ACCEL:
 					set_accel(&event);
@@ -473,9 +636,16 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 					break;
 				case XWII_EVENT_MOTION_PLUS:
 					set_motionplus(&event);
+					if(caliblate_mp_flag){
+						calibrate_motionplus(iface[i]);//i番目がどちらかは不明だが，mpイベントが発生した方なら確実
+						caliblate_mp_flag=false;
+					}
 					break;
 				case XWII_EVENT_BALANCE_BOARD:
 					set_balanceboard(&event);
+					break;
+				default:
+					puts("unexpected event occured");
 					break;
 				}
 			}
@@ -488,6 +658,15 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 					return(0);
 				case 'i'://initialize balance board
 					initCriteriaOfBalanceBoard();
+					break;
+				case 'm':
+					caliblate_mp_flag=true;
+					break;
+				case 'x':
+					init_yaw_angle();
+					break;
+				case 'z':
+					puts("received puts");
 					break;
 			}
 		}
@@ -540,10 +719,11 @@ int main(void) {
     //オムニ操作部分のセットアップ
     omniOperator1 = new OmniOperator(piId, TOP_PIN_ID, LEFT_PIN_ID, RIGHT_PIN_ID);
     omniOperator1->init(1000, 1000); //1kHz,分解能1000
-    omniOperator1->set_limit(60); //最大出力を90%に制限
+    omniOperator1->set_limit(60); //最大出力を60%に制限
 
 	/*アーム部分のセットアップ*/
 	armOperator1 = new ArmOperator(piId,SERVO_TILT,SERVO_PAN,ARM_PIN_ID,SW_PIN_ID);
+	armOperator1->init();
 
 	/*xwiimote関係*/
 	puts("start xwiimote initialition");
@@ -589,41 +769,6 @@ int main(void) {
 	timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
 //    timer_init(INTERVAL_20MSEC, SIGNAL_20MS);
 	ret = run_iface(iface,device_num);
-	return (0);
-
-	char buff[10];
-	bool quitFlag=false;
-	int prevSW=1;
-	
-	struct pollfd fds[2];
-	while(!quitFlag){
-		if(ret){
-			break;
-		}
-		float xyVals[2] = {0., 0.};
-		if(receive(0,buff,sizeof(buff))){
-			switch(buff[0]){
-				case 'a': 
-					puts("moveArmStart");
-					moveArm(piId);
-					puts("moveArmFinished");
-					break;
-				case 'b': 
-					puts("B");
-					break;
-				case 'c':
-					puts("start motionplus caliburation");
-					break;
-				case 'q':
-					puts("finishing");
-					quitFlag=true;
-					break;
-			}
-		}
-		
-		int currentSW=gpio_read(piId,SW_PIN_ID);
-	}
-
 
 	/*後処理*/
 	for(int i=0;i<device_num;i++){
@@ -638,4 +783,37 @@ int main(void) {
 	puts("Script finished");
 
     return 0;
+
+//	char buff[10];
+//	bool quitFlag=false;
+//	
+//	while(!quitFlag){
+//		if(ret){
+//			break;
+//		}
+//		float xyVals[2] = {0., 0.};
+//		if(receive(0,buff,sizeof(buff))){
+//			switch(buff[0]){
+//				case 'a': 
+//					puts("moveArmStart");
+//					moveArm(piId);
+//					puts("moveArmFinished");
+//					break;
+//				case 'b': 
+//					puts("B");
+//					break;
+//				case 'c':
+//					puts("start motionplus caliburation");
+//					break;
+//				case 'q':
+//					puts("finishing");
+//					quitFlag=true;
+//					break;
+//			}
+//		}
+//		
+//		int currentSW=gpio_read(piId,SW_PIN_ID);
+//	}
+
+
 }
