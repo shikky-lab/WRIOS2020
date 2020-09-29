@@ -304,7 +304,8 @@ void interruptedFunc(int sig, siginfo_t *si, void *uc) {
 				fputs("z\r\n",stdin);
 			}
 			prev_mp_x=wmMain._MP_ACC_X;
-			
+
+			armOperator1->checkArmState();//アームの伸縮停止判定件WDタイマ
 
             float xyVals[2] = {0., 0.};
             switch (actMode) {
@@ -357,20 +358,6 @@ int receive(int fd, char *buff, int buffSize){
 		buff[strlen(buff)-1]='\0';
 	}
 	return (i);
-}
-
-#define SW_PUSHED (gpio_read(piId,SW_PIN_ID))
-#define SW_RELEASED (!gpio_read(piId,SW_PIN_ID))
-void moveArm(int piId){
-	if(SW_RELEASED){
-		set_PWM_dutycycle(piId,ARM_PIN_ID,10);
-		while(SW_RELEASED){
-		}
-	}else{
-		set_PWM_dutycycle(piId,ARM_PIN_ID,990);
-		usleep(500*1000);
-	}
-	set_PWM_dutycycle(piId,ARM_PIN_ID,500);
 }
 
 class IndicatorOperator{
@@ -488,6 +475,13 @@ static void set_keys(const struct xwii_event *event)
 			}
 			break;
 		case XWII_KEY_B:
+			if(pressed){
+				armOperator1->extendArm();
+				puts("arm extended");
+			}else{
+				armOperator1->shortenArm();
+				puts("arm shortened");
+			}
 			break;
 		case XWII_KEY_PLUS:
 			break;

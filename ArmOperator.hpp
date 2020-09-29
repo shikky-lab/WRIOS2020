@@ -14,6 +14,12 @@
 #define SERVO_MIN 1000
 #define SERVO_RANGE 300
 
+enum ARM_STATE{
+		STOP,
+		EXTENDING,
+		SHORTENING
+	};
+
 class ArmOperator{
 
 private:
@@ -24,6 +30,14 @@ private:
 	const uint8_t PAN_PIN_ID;
 	const uint8_t EXTRUDER_PIN_ID;
 	const uint8_t LIMIT_SW_PIN_ID;
+	int pwm_middle;
+	int pwm_extension_speed;
+	int pwm_shorten_speed;
+	uint8_t state=STOP;
+	const int EXTENDING_COUNT_MAX=3;
+	const int MOVING_COUNT_MAX=5;
+	int moving_count;
+		
 	int32_t tilt_middle;
 	int32_t pan_middle;
 
@@ -33,13 +47,20 @@ private:
 	int32_t calcTilt(int32_t angle);
 	int32_t calcPan(int32_t angle);
 
+	int sw_pressed();
+	int sw_released();
+
 public:
 	ArmOperator(uint8_t piId,uint8_t tiltPin,uint8_t panPin,uint8_t extruderPin, uint8_t limitSwPin);
-	void init(int freq=300,int range=500);
+	void init(int freq=300,int range=1000);
 	void setPan(int32_t angle);
 	void setTilt(int32_t angle);
 	void setTiltMiddle(int32_t angle);
 	int32_t getTiltMiddle();
+	void extendArm();
+	void shortenArm();
+	void checkArmState();
+	void stop_arm();
 };
 
 #endif /* ARMOPERATOR_HPP_ */
