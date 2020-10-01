@@ -28,7 +28,8 @@ void ArmOperator::init(int freq,int range){
     set_mode(PI_ID, LIMIT_SW_PIN_ID, PI_INPUT);
     set_pull_up_down(PI_ID, LIMIT_SW_PIN_ID, PI_PUD_UP);
 
-	tilt_middle=1635;//実測値を直接指定
+//	tilt_middle=1500;//実測値を直接指定
+	tilt_middle=1337;//実測値を直接指定
 	pan_middle=1500;
 	
 	/*アーム根本のサーボ初期化*/

@@ -247,13 +247,13 @@ float addReviseRotation(float rate = 0.3) {
     if (actMode == NUNCHUK) {
         return 0;
     }
+	
+	//以下，actModeがBalanceBoardのとき
 
 	float x_val=float(wmMain._NC_STICK_X)/100;//-1~1の値が得られる
-//    float y_val = float(wiimote->state.ext.nunchuk.stick[CWIID_Y]) / 127 - 1;
     if (abs_(x_val) < 5.0 / 100) {
         x_val = 0;
     }
-//    printf("stickX:%f\r\n", x_val);
     return -x_val*rate;
 }
 
@@ -284,7 +284,8 @@ void interruptedFunc(int sig, siginfo_t *si, void *uc) {
             break;
 		case SIGNAL_20MS:
 			break;
-		case SIGNAL_200MS:
+//		case SIGNAL_200MS:
+		case SIGNAL_50MS:
 			//バランスボード重量
 //			printf("bbW:%05hu\tbbX:%05hu\tbbY:%05hu\tbbZ:%05hu\r\n",wmBB._BB_LEFT_TOP,wmBB._BB_RIGHT_TOP,wmBB._BB_LEFT_BOTTOM,wmBB._BB_RIGHT_BOTTOM);
 			//ヌンチャク
@@ -712,12 +713,14 @@ int main(void) {
 
     //オムニ操作部分のセットアップ
     omniOperator1 = new OmniOperator(piId, TOP_PIN_ID, LEFT_PIN_ID, RIGHT_PIN_ID);
-    omniOperator1->init(1000, 1000); //1kHz,分解能1000
+    omniOperator1->init(300, 1000); //1kHz,分解能1000
     omniOperator1->set_limit(60); //最大出力を60%に制限
 
 	/*アーム部分のセットアップ*/
 	armOperator1 = new ArmOperator(piId,SERVO_TILT,SERVO_PAN,ARM_PIN_ID,SW_PIN_ID);
 	armOperator1->init();
+	
+//	return (0);
 
 	/*xwiimote関係*/
 	puts("start xwiimote initialition");
@@ -760,7 +763,8 @@ int main(void) {
 	}
 
 	interupt_init();
-	timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
+//	timer_init(INTERVAL_200MSEC, SIGNAL_200MS);
+	timer_init(INTERVAL_50MSEC, SIGNAL_50MS);
 //    timer_init(INTERVAL_20MSEC, SIGNAL_20MS);
 	ret = run_iface(iface,device_num);
 
@@ -777,37 +781,5 @@ int main(void) {
 	puts("Script finished");
 
     return 0;
-
-//	char buff[10];
-//	bool quitFlag=false;
-//	
-//	while(!quitFlag){
-//		if(ret){
-//			break;
-//		}
-//		float xyVals[2] = {0., 0.};
-//		if(receive(0,buff,sizeof(buff))){
-//			switch(buff[0]){
-//				case 'a': 
-//					puts("moveArmStart");
-//					moveArm(piId);
-//					puts("moveArmFinished");
-//					break;
-//				case 'b': 
-//					puts("B");
-//					break;
-//				case 'c':
-//					puts("start motionplus caliburation");
-//					break;
-//				case 'q':
-//					puts("finishing");
-//					quitFlag=true;
-//					break;
-//			}
-//		}
-//		
-//		int currentSW=gpio_read(piId,SW_PIN_ID);
-//	}
-
 
 }

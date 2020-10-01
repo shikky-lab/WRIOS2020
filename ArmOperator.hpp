@@ -34,8 +34,8 @@ private:
 	int pwm_extension_speed;
 	int pwm_shorten_speed;
 	uint8_t state=STOP;
-	const int EXTENDING_COUNT_MAX=3;
-	const int MOVING_COUNT_MAX=5;
+	const int EXTENDING_COUNT_MAX=6;
+	const int MOVING_COUNT_MAX=20;
 	int moving_count;
 		
 	int32_t tilt_middle;

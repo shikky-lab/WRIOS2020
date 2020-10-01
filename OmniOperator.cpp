@@ -84,8 +84,8 @@ void OmniOperator::calc_translation(float x, float y){
 		return;
 	}
 
-//	float rad0 = x!=0?atan2f(y,x):y>0?PI/2:-PI/2;
-	float rad = _atan2((int16_t)(y*1000),(int16_t)(x*1000));
+	float rad = x!=0?atan2f(y,x):y>0?PI/2:-PI/2;
+//	float rad = _atan2((int16_t)(y*1000),(int16_t)(x*1000));
 
 //	printf("org=%.5f\tsimpl=%.5f\r\n",rad0,rad);
 
@@ -148,6 +148,9 @@ void OmniOperator::set_limit(int percent) {
 
 //receive,x(-1,1),y(-1,1),r(-1,1)
 void OmniOperator::move(float x,float y,float r){
+
+	//必要に応じて，X方向を反転させる．Yはモータ接続を逆にすればおそらく対処可能．
+	x=-x;
 
 	calc_translation(x,y);
 	calc_rotation(r);
