@@ -18,7 +18,7 @@
 #include <bluetooth/rfcomm.h>
 #include <sys/socket.h>
 #include <string.h>
-//#include <curses.h>
+#include <fcntl.h>
 
 #define MSEC 1000000
 #define INTERVAL_200MSEC 200*MSEC
@@ -205,7 +205,9 @@ int32_t calc_yaw(){
 	//1000大体6000くらいで90度．(根拠なし)
 	return totalYaw*3/20;//90/6000=>3/20 
 }
-bool caliblate_mp_flag=true;
+bool caliblate_mp_flag=true;//水平状態の時に初期化ボタンを押された際にtrueになる
+//int xwiimote_stopped_flag_cnt=0;//xwiimoteからの入力が止まってしまったことを検出した際に+1
+//bool xwiimote_stopped_flag=false;//xwiimoteからの入力が止まってしまったことを検出した際にtrueになる
 
 void interruptedFunc(int sig, siginfo_t *si, void *uc);
 
@@ -275,7 +277,7 @@ int calcByNunchuk( float xyVals[2]) {
     return 0;
 }
 
-uint32_t prev_mp_x=0;
+//uint32_t prev_mp_x=0,prev_mp_y=0,prev_mp_z=0;
 void interruptedFunc(int sig, siginfo_t *si, void *uc) {
     static uint8_t buttonA = 0;
     static uint8_t buttonC = 0;
@@ -299,12 +301,19 @@ void interruptedFunc(int sig, siginfo_t *si, void *uc) {
 			armOperator1->setTilt(calc_pitch());
 			armOperator1->setPan(calc_yaw());
 
-			if(prev_mp_x==wmMain._MP_ACC_X){
-//				caliblate_mp_flag=true;
-//				puts("fputs called");
-				fputs("z\r\n",stdin);
-			}
-			prev_mp_x=wmMain._MP_ACC_X;
+			//Wiiリモコンからの入力がストップしてしまったケースの検出．mp3つとも値が変わっていなければまず確実．初期化中などは値が0のまま取得されてしまうので無視
+			//と思ったが稀に誤動作するので，2連続で条件を満たした際に検出することにする
+//			if(wmMain._MP_ACC_X!=0 &&wmMain._MP_ACC_Y!=0 &&wmMain._MP_ACC_Z!=0
+//					&& prev_mp_x==wmMain._MP_ACC_X && prev_mp_y==wmMain._MP_ACC_Y && prev_mp_z==wmMain._MP_ACC_Z ) {
+//				if(++xwiimote_stopped_flag_cnt>=2){
+//					xwiimote_stopped_flag=true;
+//					puts("fputs called");
+	//				fputs("z\r\n",stdin);
+//				}
+//			}else{
+//				xwiimote_stopped_flag_cnt=0;
+//			}
+//			prev_mp_x=wmMain._MP_ACC_X; prev_mp_y=wmMain._MP_ACC_Y; prev_mp_z=wmMain._MP_ACC_Z;
 
 			armOperator1->checkArmState();//アームの伸縮停止判定件WDタイマ
 
@@ -395,17 +404,17 @@ public:
 };
 
 //エラー発生時にコール．エラー点滅ののちプログラム終了
-void quitProgram(int piId, IndicatorOperator &greenLedOperator,IndicatorOperator &redLedOperator ) {
-	greenLedOperator.startSlowBrink();
-	redLedOperator.startSlowBrink();
+void quitProgram(int piId, IndicatorOperator *greenLedOperator,IndicatorOperator *redLedOperator,int ret) {
+	greenLedOperator->startSlowBrink();
+	redLedOperator->startSlowBrink();
 
     time_sleep(3);
-	greenLedOperator.putOff();
-	redLedOperator.putOff();
+	greenLedOperator->putOff();
+	redLedOperator->putOff();
 //	delete(greenLedOperator);
 //	delete(redLedOperator);
     pigpio_stop(piId);
-    exit(0);
+    exit(ret);
 }
 static char *get_dev(int num)
 {
@@ -589,15 +598,36 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 //	curs_set(0);
 //	timeout(0);//getch()のタイムアウトを0にする．
 
+	sigset_t sigmask;
+	ret=sigaddset(&sigmask,SIGALRM);
+	if(ret<0){
+		puts("sgaddset failed");
+	}
+	fcntl(0,F_SETFL,O_NONBLOCK);//標準入力をノンブロッキングに
 	char buff[10];
 	while(true){
-		ret = poll(fds, fds_num, -1);//標準入力含め，変化があるまで待機．なんかよく固まるからタイムアウト入れてみた．
+//		ret = poll(fds, fds_num, 0);//標準入力含め，変化があるまで待機．
+		struct timespec timeout;
+		timeout.tv_nsec = 40*1000*1000;//40ms
+		timeout.tv_sec = 0;
+		ret = ppoll(fds, fds_num, &timeout,&sigmask);//標準入力含め，変化があるまで待機．タイマ割り込みで待機から抜けないようマスク
 		if (ret < 0) {
-			if (errno != EINTR) {
+			if (errno != EINTR) {//待機中にシグナル発生したらEINTRが呼ばれる．
 				ret = -errno;
 				printf("Error: Cannot poll fds: %d", ret);
 				return ret;
+			}else{
+				puts("eintr occurred");//ppollで適切にマスクしている場合，呼ばれないはず．
+
 			}
+		}
+//		puts("polled");
+		if(ret==0){//timeout発生時．※正常時はイベントが発生したfd数=正が返ってきている
+			puts("timeout occured");
+//			if(xwiimote_stopped_flag){
+//				puts("xwiimote stopped!!");
+//				return -1;
+//			}
 		}
 
 		for(int i=0;i<device_num;i++){
@@ -646,7 +676,13 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 			}
 		}
 
-		if(receive(0,buff,sizeof(buff))){
+
+//		puts("dispatched");
+		char buff[10];
+//		read(fd,buff,sizeof(buff));
+//		buff[strlen(buff)-1]='\0';
+//		if(receive(0,buff,sizeof(buff))){
+		if(read(0,buff,sizeof(buff))){
 			switch(buff[0]){
 				case 'q':
 					puts("finish");
@@ -665,6 +701,7 @@ static int run_iface(struct xwii_iface *iface[],const int device_num)
 					break;
 			}
 		}
+//		puts("received");
 	}
 
 	return ret;
@@ -732,10 +769,12 @@ int main(void) {
 	int ret= get_all_device_paths(paths,&device_num);
 	if(ret!=0){
 		puts("failed to get any device path");
+		quitProgram(piId,&greenLedOperator,&redLedOperator,ret);
 		return ret;
 	}
 	if(device_num==0){
 		puts("there are not connected devices");
+		quitProgram(piId,&greenLedOperator,&redLedOperator,ret);
 		return ret;
 	}
 
@@ -746,6 +785,7 @@ int main(void) {
 		ret = xwii_iface_new(&iface[i], paths[i]);
 		if (ret) {
 			printf("Cannot create xwii_ifaces No.%d\r\n",  i);
+			quitProgram(piId,&greenLedOperator,&redLedOperator,ret);
 			return ret;
 		}
 	}
@@ -755,6 +795,7 @@ int main(void) {
 		ret = xwii_iface_open(iface[i], xwii_iface_available(iface[i]) | XWII_IFACE_WRITABLE);
 		if (ret){
 			printf("Error: Cannot open interface: %d\r\n", i);
+			quitProgram(piId,&greenLedOperator,&redLedOperator,ret);
 			return ret;
 
 		}else{
@@ -780,6 +821,9 @@ int main(void) {
 
 	puts("Script finished");
 
-    return 0;
+	if(ret!=0){
+		quitProgram(piId,&greenLedOperator,&redLedOperator,ret);
+	}
+	return 0;
 
 }
