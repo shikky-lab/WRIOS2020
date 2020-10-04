@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=GNU-Linux
 CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux
-CND_ARTIFACT_NAME_Debug=altwrios2020
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/altwrios2020
+CND_ARTIFACT_NAME_Debug=wrios2020
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/wrios2020
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
-CND_PACKAGE_NAME_Debug=altwrios2020.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/altwrios2020.tar
+CND_PACKAGE_NAME_Debug=wrios2020.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/wrios2020.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
-CND_ARTIFACT_NAME_Release=altwrios2020
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/altwrios2020
+CND_ARTIFACT_NAME_Release=wrios2020
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/wrios2020
 CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
-CND_PACKAGE_NAME_Release=altwrios2020.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/altwrios2020.tar
+CND_PACKAGE_NAME_Release=wrios2020.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/wrios2020.tar
 #
 # include compiler specific variables
 #

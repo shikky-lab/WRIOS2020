@@ -28,6 +28,8 @@ private:
         int max_count;
         int middle_count;
         int calc_max_count;
+        int button_pushed=0;
+        int button_released=0;
 
 	void calc_translation(float y, float x);
 	void calc_rotation(float r);
