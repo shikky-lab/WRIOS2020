@@ -51,6 +51,8 @@ private:
 	int sw_released();
 
 public:
+        int button_pushed=0;
+        int button_released=0;
 	ArmOperator(uint8_t piId,uint8_t tiltPin,uint8_t panPin,uint8_t extruderPin, uint8_t limitSwPin);
 	void init(int freq=300,int range=1000);
 	void setPan(int32_t angle);

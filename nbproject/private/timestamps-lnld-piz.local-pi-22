@@ -1,14 +1,15 @@
-#Sun Oct 04 06:29:08 JST 2020
+#Sun Oct 04 10:09:06 JST 2020
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\16\\b2f9d39e6934a0e5a5228a4ce2081b1b38a4cd=c1600887566498
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\refs\\heads\\master=c1601577006439
 c\:\\users\\lnld\\git\\wrios2020\\nbproject\\makefile-variables.mk=c1601666357469
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\02\\726408c7f01cc91bdad9b6702c2e8c2a457e7b=c1601771457815
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\98\\e74b160cec39b3c376387cb078af4a1d4ef796=c1600963436678
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\c7\\3070df9d184901e8ca6094bd01d2ddd7f2f617=c1600887566538
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\nbproject\\makefile-debug.mk=c1601188677133
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\f2\\e6a33ad2cc4b437a22e8015aa9d26d98117793=c1601665853800
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\omnioperator.hpp=c1601116866599
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\39\\96fc6710141ad1f5185eac5a34ec9a9375b99a=c1601131952912
-c\:\\users\\lnld\\git\\wrios2020\\.git\\refs\\heads\\master=c1601666051804
+c\:\\users\\lnld\\git\\wrios2020\\.git\\refs\\heads\\master=c1601771457898
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\82\\3d5bb91af8e8a02dd519d155bf59e6478ad448=c1600963436685
 c\:\\users\\lnld\\git\\wrios2020\\.git\\hooks\\prepare-commit-msg.sample=c1601665851049
 c\:\\users\\lnld\\git\\wrios2020\\.git\\info\\exclude=c1601665851049
@@ -29,6 +30,7 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\n
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\70\\5f4715fb048c406eab7cb5a6a5ebbdb41d5751=c1601195581645
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\00\\2cba7923cddebdcefabb9974568996a2fb45be=c1601665853597
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\3e\\dc2d8977c136e0de4681666834363510295ca0=c1601665853753
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\a8\\a34daf7ac60e48b5ba1e29cedf91134e67eb7f=c1601771457746
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\1c\\6060695b069baf2256ff938830a01c8b4b5792=c1601375163110
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\e6\\9de29bb2d1d6434b8b29ae775ad8c2e48c5391=c1600887566586
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\da\\a8af95586496d569ea8ccaba8f74af9e9fc62d=c1601145301688
@@ -39,6 +41,7 @@ c\:\\users\\lnld\\git\\wrios2020\\.git\\logs\\refs\\remotes\\origin\\head=c16016
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\mpu9250.h=c1598638279446
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\42\\410fcde01e4bd62cd527b523cef6ead9663d92=c1601145301634
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\d0\\55052573c3aa4858a52817e93d2cda0c368aad=c1601665853753
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\af\\2f4bc93a7bd953e54b2c28c2e945e9bdfe7135=c1601771457890
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\b6\\e47dde718081aee75f8a0f552104d9e7d29638=c1601665853878
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\nbproject\\makefile-impl.mk=c1601131499139
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\a3\\5cf2a95e01cf8080c81936fb3d35f5c240438c=c1601665853816
@@ -46,6 +49,7 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\config=c1600887008033
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\main.cpp=c1572170165360
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\06\\6b5ee54e24c5daee22d7a5b9d56663e6ae3c49=c1601131952829
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\5f\\6b80fbd0c1db71b0121d8826a8dd3d4b519a74=c1601771457786
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\wiimote.cpp=c1601076269877
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\03\\6ca122f5dbbc7178e27c7b9b937917d48bb5e0=c1600887566553
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\nbproject\\makefile-impl.mk=c1598638341953
@@ -54,6 +58,8 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\73\\0a328d08c33b771160e2c4bd0c57bd55eb67aa=c1601665853769
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\mpu9250operator.h=c1566746251219
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\armoperator.hpp=c1601410591536
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\a3\\da27236e757428346fdd29c3ed960d005867a9=c1601771457881
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\e5\\597c217d80a7165dff82491aab37deef67137a=c1601771457781
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\index=c1601577006450
 c\:\\users\\lnld\\git\\wrios2020\\.git\\logs\\refs\\heads\\main=c1601665853956
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\f9\\219e78ad2c2e6e44b3e71ac6e69c9f6042df49=c1601293074319
@@ -66,7 +72,7 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\79\\5b12671cc2347f370db29f57811d0aada2ca9c=c1601665853831
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\a5\\e29db4807beb3bf19e29038a506551c0525920=c1600887566660
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\ca\\cfa0028d47ac45ff4323ec720a34dd6d4ce2a6=c1601577006426
-c\:\\users\\lnld\\git\\wrios2020\\omnioperator.hpp=c1601666051788
+c\:\\users\\lnld\\git\\wrios2020\\omnioperator.hpp=c1601773449645
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\d2\\541919df8fca048b049501b3a45f7bb5dda442=c1601665853816
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\43\\930b60f78580d04cfbeb20037853fa6a19934a=c1600887566618
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\4d\\5b4bfbe2de1e7adb70a02f956d234c35d959e8=c1601293074325
@@ -100,10 +106,11 @@ c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\04\\f6fa6609e84206d63c3050f536e
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\cd\\ff7c5383f5ab743a42f3b019b8dcb1d7644909=c1601665853581
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\mpu9250operator.cpp=c1566748923050
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\79\\ad2898c02734b27c4c30e7d56a7e8e46baabc9=c1601665853847
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\c7\\dd0bd8a7e3aebee3eab38ecc17d4ecb854245e=c1601771457757
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\logs\\head=c1600963436746
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\fc\\3e515edd802f0451727d28be5a5bb2e38dd050=c1601375163209
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\05\\de621e858db82f833158636204309122e2dfa5=c1601665853597
-c\:\\users\\lnld\\git\\wrios2020\\.git\\logs\\refs\\heads\\master=c1601666051804
+c\:\\users\\lnld\\git\\wrios2020\\.git\\logs\\refs\\heads\\master=c1601771457900
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\madgwickahrs.hpp=c1601116866594
 c\:\\users\\lnld\\git\\wrios2020\\.git\\hooks\\commit-msg.sample=c1601665851049
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\85\\0fa64432e2959f8356c3ca3614b917c31d0719=c1601665853816
@@ -121,7 +128,7 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\madgwickahrs.h=c1566132095922
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\d0\\55052573c3aa4858a52817e93d2cda0c368aad=c1601577006381
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\madgwickahrs.c=c1566132126780
-c\:\\users\\lnld\\git\\wrios2020\\armoperator.hpp=c1601666051788
+c\:\\users\\lnld\\git\\wrios2020\\armoperator.hpp=c1601771609870
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\5d\\a7424d6034d4ac42541a7ec11cd5d1d0553b95=c1601665853612
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\b6\\e47dde718081aee75f8a0f552104d9e7d29638=c1601131952869
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\nbproject\\makefile-debug.mk=c1566132585029
@@ -135,6 +142,7 @@ c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\fc\\4ac13068296b38bbcc1d2d8ba8b
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\f9\\224522ab4303b458ceb8a252b9d744bb517dd3=c1601665853816
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\93\\1ae1266a2d42daf4c7c3e64e19d9d42d9c5057=c1600887566485
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\04\\fbd36e737193953674a475f6e3e33aeb8488ec=c1601665853878
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\03\\6ca122f5dbbc7178e27c7b9b937917d48bb5e0=c1601771457790
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\53\\5caaebe2cc543be7b9b398a74f0d304c3d81da=c1601665853831
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\armoperator.cpp=c1601609989446
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\00\\00d88db7b4f4f881d4b5c2847dee00d9a8f64b=c1600887566672
@@ -148,6 +156,7 @@ c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\5d\\91c6f58af137bfad2f9f933c191
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\43\\1423da50f36f8bb6401176ac9caa22366dd179=c1600887566601
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\a4\\a46fad76156b76cbc4956e1578606ed14f1bc8=c1601145301647
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\36\\1c0772dc10ee3c44ccb61a4741095ad048e919=c1601665853847
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\f3\\793f5f1e1a0f6023fc04e5a019a363bb8662be=c1601771457802
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\6d\\8133dccdff60c5df73d329eb5d5a5798eb997f=c1601665853691
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\99\\ffc285b17315618f7e647110e84c9484a6698b=c1600963436733
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\nbproject\\makefile-release.mk=c1601131925253
@@ -181,8 +190,10 @@ c\:\\users\\lnld\\git\\wrios2020\\nbproject\\private\\makefile-variables.mk=c160
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\13\\d4541e4346016116475041e36d32d996913ef7=c1600887566514
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\a4\\7461a2dcc791c86ae79258df72c7396394e785=c1601665853784
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\78\\92fe7bd12a6aaee48f72a2a7c4ae8fb7274801=c1601665853878
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\cd\\67b3929e09fdcc46ccfe2b9d372007867627cc=c1601771457886
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\82\\bfb3291d01047ddb51279d02fc9330652b1e2d=c1601665853847
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\05\\de621e858db82f833158636204309122e2dfa5=c1601131952812
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\c7\\3070df9d184901e8ca6094bd01d2ddd7f2f617=c1601771457777
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\nbproject\\makefile-debug.mk=c1600891019410
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\a8\\70fc62fd67402bea4665f2b9fd785f37b18015=c1601665853831
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\85\\0fa64432e2959f8356c3ca3614b917c31d0719=c1601293074361
@@ -193,10 +204,11 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\89\\81e17babdd28adf1072082e5229c5b91f274f7=c1601665853847
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\c2\\548d20c8fed1cb4042fa2794538d558e670573=c1601131952878
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\head=c1600887008019
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\7f\\af3727cc83b9590ade9f554b87788e39c1e070=c1601771457796
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\9b\\466945a45c49e40ebe7f97842e8b3fac167cef=c1601131952939
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\c0\\ff13e77d73fda06ff4066c80e4b2ffdc0c4cad=c1601665853581
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\6b\\3e97764e99d2cf5daa257af36ca75b894dd2b2=c1601577006366
-c\:\\users\\lnld\\git\\wrios2020\\armoperator.cpp=c1601760544965
+c\:\\users\\lnld\\git\\wrios2020\\armoperator.cpp=c1601772914063
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\armoperator.hpp=c1600891105570
 c\:\\users\\lnld\\git\\wrios2020\\.git\\hooks\\pre-commit.sample=c1601665851049
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\fc\\4ac13068296b38bbcc1d2d8ba8bab3c86bfdd5=c1601189000507
@@ -228,7 +240,7 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\89\\5cfd75e389529fc2f6e2f33cf9f6cb60a65ec8=c1601375163098
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\6f\\2b42c7af47610e51c0a6d22b9ed4bc70baf5a6=c1601665853800
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\nbproject\\package-debug.bash=c1598638342012
-c\:\\users\\lnld\\git\\wrios2020\\.git\\logs\\head=c1601666051819
+c\:\\users\\lnld\\git\\wrios2020\\.git\\logs\\head=c1601771457899
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\05\\de621e858db82f833158636204309122e2dfa5=c1600887566503
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\mpu9250operator.cpp=c1598638279428
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\18\\59e6bd0f840f821ebb20f7a3a70d0bc4771f8f=c1601577006422
@@ -238,12 +250,13 @@ c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\30\\e1bd1ea02cce1de4ba8419af8a8
 c\:\\users\\lnld\\git\\wrios2020\\.git\\hooks\\pre-applypatch.sample=c1601665851049
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\logs\\refs\\heads\\master=c1601577006447
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\18\\06ce90ef3ae60013d96514ee3f3e0d81275eb5=c1601189000516
-c\:\\users\\lnld\\git\\wrios2020\\.git\\index=c1601666051804
+c\:\\users\\lnld\\git\\wrios2020\\.git\\index=c1601771457906
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\6d\\d5a85f135025a27fd5857d45b01c2f6981c797=c1601293074366
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\makefile=c1598638279434
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\f6\\3f011fc5f61551c75f73ff48c7401891eb1b29=c1601665853862
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\18\\c839280622f6f92c54a0e2a90d33c182ae2e63=c1601189000521
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\makefile=c1601116866579
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\2b\\d3ed169a7ee02f0e360522767f5a8e8a694850=c1601771457770
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\c2\\548d20c8fed1cb4042fa2794538d558e670573=c1600887566569
 c\:\\users\\lnld\\git\\wrios2020\\.git\\hooks\\pre-push.sample=c1601665851049
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\4e\\92b4fafb6758a104586f7fee723c26cd7a86e7=c1601145301621
@@ -265,6 +278,7 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\53\\5caaebe2cc543be7b9b398a74f0d304c3d81da=c1600963436664
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\da\\a8af95586496d569ea8ccaba8f74af9e9fc62d=c1601665853581
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\78\\b6b449311037c58b8bd65c06c780a7db57f48d=c1600887566491
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\68\\46736b996f2a473d00938d9293179da53e4cb4=c1601771457763
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\nbproject\\package-release.bash=c1565699093222
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\nbproject\\makefile-variables.mk=c1565699093233
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\42\\410fcde01e4bd62cd527b523cef6ead9663d92=c1601665853722
@@ -289,6 +303,7 @@ c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\nbproject\\project.xml=c1601132276997
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\62\\c89d650469d5823ea788d976ec07f9ad39ae36=c1601131952930
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\mpu9250test\\madgwickahrs.hpp=c1568584376227
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\38\\88fd895a2e84e143052578b4ac6e2da92df7a6=c1601771457878
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\9a\\27e27832a184e2268c9aa5b79082e883894830=c1600887566654
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\e6\\9de29bb2d1d6434b8b29ae775ad8c2e48c5391=c1601131952893
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\f9\\219e78ad2c2e6e44b3e71ac6e69c9f6042df49=c1601665853800
@@ -302,11 +317,12 @@ c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\07\\5cd59d8ac044edb3eeb6e797301
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\4d\\5b4bfbe2de1e7adb70a02f956d234c35d959e8=c1601665853769
 c\:\\users\\lnld\\git\\wrios2020\\nbproject\\project.xml=c1601666051804
 c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\ea\\a289202e9b40a1c823dd9ad86b410b136d1486=c1601665853878
-c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\head=c1601131900542
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\d4\\b588d08c391579c846efc3d09670c8e5a723e6=c1601131952860
+c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\head=c1601131900542
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\.git\\objects\\0a\\f86ef80181ecc0b9a69c45bea730f78bd49983=c1600887566476
-VERSION=1.3
+c\:\\users\\lnld\\git\\wrios2020\\.git\\objects\\af\\4d15b8151a53e23228476d3aa5a764ac79bb70=c1601771457807
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\8d\\13a55150d647303d0285b92a2760a38ef8d811=c1601577006386
-c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\nbproject\\makefile-variables.mk=c1598638342093
+VERSION=1.3
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\6e\\ccf570841e1aced31e8cf635ed6e280e144443=c1601145301653
+c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\wrios2020\\nbproject\\makefile-variables.mk=c1598638342093
 c\:\\users\\mfukunaga\\googledrive\\mydrive\\raspberrypi\\netbeans\\altwrios2020\\.git\\objects\\28\\e33a49f00a2ba141a91aa80ce5d5257945d800=c1601131952802

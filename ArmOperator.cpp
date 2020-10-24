@@ -101,14 +101,18 @@ int32_t ArmOperator::getTiltMiddle(){
 void ArmOperator::extendArm(){
 	moving_count=0;
 	state=EXTENDING;
-	set_PWM_dutycycle(PI_ID,EXTRUDER_PIN_ID,pwm_extension_speed);
+    button_pushed=1;
+    button_released=0;
+	//set_PWM_dutycycle(PI_ID,EXTRUDER_PIN_ID,pwm_extension_speed);
 
 }
 
 void ArmOperator::shortenArm(){
 	moving_count=0;
-	state=SHORTENING;
-	set_PWM_dutycycle(PI_ID,EXTRUDER_PIN_ID,pwm_shorten_speed);
+	state=SHORTENING;   
+    button_released=1;
+    button_pushed=0;
+	//set_PWM_dutycycle(PI_ID,EXTRUDER_PIN_ID,pwm_shorten_speed);
 }
 
 int ArmOperator::sw_pressed(){
@@ -123,10 +127,19 @@ void ArmOperator::stop_arm(){
 	set_PWM_dutycycle(PI_ID,EXTRUDER_PIN_ID,pwm_middle);
 	state=STOP;
 	moving_count=0;//無くてもいいはずだが念のため
+    button_released=0;
+    button_pushed=0;
 }
 
 void ArmOperator::checkArmState(){
-	moving_count++;
+	
+    if(button_pushed==1){
+        set_PWM_dutycycle(PI_ID,EXTRUDER_PIN_ID,pwm_extension_speed);
+    }
+    if(button_released==1){
+        set_PWM_dutycycle(PI_ID,EXTRUDER_PIN_ID,pwm_shorten_speed);
+    }
+    moving_count++;
 	switch(state){
 		case STOP:
 			moving_count=0;//無くてもいいはずだが念のため

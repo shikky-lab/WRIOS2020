@@ -28,14 +28,13 @@ private:
         int max_count;
         int middle_count;
         int calc_max_count;
-        int button_pushed=0;
-        int button_released=0;
+        
 
 	void calc_translation(float y, float x);
 	void calc_rotation(float r);
 	void set_motor_count();
 	void fastAtan(float y,float x);
-public:
+public:        
 	OmniOperator(uint8_t id,uint8_t top,uint8_t left,uint8_t right);
         void set_limit(int percent);
         void init(int freq,int range);
